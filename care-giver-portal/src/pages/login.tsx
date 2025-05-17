@@ -54,7 +54,7 @@ export default function Login() {
     setLoginError('');
 
     try {
-      const response = await fetch('http://localhost:8090/web/caregiver/login', {
+      const response = await fetch('https://3f95-2402-e280-212e-e5-1847-7ad2-f961-6092.ngrok-free.app/web/caregiver/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData)
@@ -71,7 +71,7 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('user', JSON.stringify(data.user));
 
-      navigate('/caregiver-dashboard');
+      navigate('/dashboard');
     } catch (err) {
       console.error('Login failed:', err);
       setLoginError('Server error. Please try again.');
