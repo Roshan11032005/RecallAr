@@ -1,18 +1,19 @@
 import { Image } from 'expo-image';
-import { Platform, StyleSheet } from 'react-native';
-import { Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import { HelloWave } from '@/components/HelloWave';
-import ParallaxScrollView from '@/components/ParallaxScrollView';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 
 export default function HomeScreen() {
   return (
     <ThemedView style={styles.container}>
-      <ThemedText type="title" style={styles.title}>Welcome to RecallAR!</ThemedText>
-      <Text style={styles.subtitle}>Helping Alzheimer's patients with AR support</Text>
+      <ThemedText type="title" style={styles.title}>
+        Welcome to RecallAR!
+      </ThemedText>
+      <Text style={styles.subtitle}>
+        Helping Alzheimer's patients with AR support
+      </Text>
       <HelloWave />
-   
     </ThemedView>
   );
 }
