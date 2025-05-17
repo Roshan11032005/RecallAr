@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
@@ -14,27 +13,19 @@ export default function Login() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [loginError, setLoginError] = useState('');
-  
+
   const navigate = useNavigate();
-  
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-      
-    // Clear general login error when any field changes
-    if (loginError) {
-      setLoginError('');
-    }
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (loginError) setLoginError('');
   };
-  
+
   const validateForm = () => {
     let isValid = true;
     const newErrors = { email: '', password: '' };
-    
-    // Email validation
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
       isValid = false;
@@ -42,8 +33,7 @@ export default function Login() {
       newErrors.email = 'Email is invalid';
       isValid = false;
     }
-    
-    // Password validation
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
@@ -51,56 +41,45 @@ export default function Login() {
       newErrors.password = 'Password must be at least 6 characters';
       isValid = false;
     }
-    
+
     setErrors(newErrors);
     return isValid;
   };
-  
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
     setLoginError('');
-    
+
     try {
-      // This is where you would make an API call to your backend
-      // Example:
-      // const response = await fetch('/api/login', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
-      // });
-      
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // For demo purposes, let's assume login is successful if email contains "test"
-      if (formData.email.includes('test')) {
-        // Successful login
-        console.log('Login successful!', formData);
-        
-        // Store auth token, user info, etc.
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        
-        // Redirect to dashboard or home
-        navigate('/dashboard');
-      } else {
-        // Failed login
-        setLoginError('Invalid email or password');
+      const response = await fetch('http://localhost:8090/web/caregiver/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setLoginError(data.error || 'Login failed');
+        return;
       }
-    } catch (error) {
-      console.error('Login error:', error);
-      setLoginError('An error occurred. Please try again.');
+
+      // Save JWT & user info to localStorage
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+
+      navigate('/caregiver-dashboard');
+    } catch (err) {
+      console.error('Login failed:', err);
+      setLoginError('Server error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <>
       <style>{`
@@ -266,8 +245,7 @@ export default function Login() {
           text-decoration: underline;
         }
       `}</style>
-
-<div className="login-container">
+      <div className="login-container">
         <div className="login-box">
           <img
             src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWE2czdjcDk3emgybGFpazF0bHZqcnQ2bmJmbHZ2bDdkZmZvcW9rNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VbnUQpnihPSIgIXuZv/giphy.gif"
@@ -275,11 +253,9 @@ export default function Login() {
             className="gif-logo"
           />
           <h2 className="login-title">Welcome Back</h2>
-          
-          {loginError && (
-            <div className="error-message">{loginError}</div>
-          )}
-          
+
+          {loginError && <div className="error-message">{loginError}</div>}
+
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label className="form-label">Email</label>
@@ -304,8 +280,8 @@ export default function Login() {
                   value={formData.password}
                   onChange={handleChange}
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -314,15 +290,15 @@ export default function Login() {
               </div>
               {errors.password && <div className="error-text">{errors.password}</div>}
             </div>
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Signing In...' : 'Sign In'}
             </button>
           </form>
-          
+
           <Link to="/signup" className="signup-link">
             Don't have an account? <span>Create One</span>
           </Link>

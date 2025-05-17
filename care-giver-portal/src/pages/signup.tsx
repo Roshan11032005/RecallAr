@@ -19,39 +19,31 @@ export default function Signup() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [signupError, setSignupError] = useState('');
-  
+
   const navigate = useNavigate();
-  
-  const handleChange = (e: { target: { name: any; value: any; }; }) => {
+
+  const handleChange = (e: { target: { name: any; value: any } }) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  
-    // Clear general signup error when any field changes
-    if (signupError) {
-      setSignupError('');
-    }
+    setFormData({ ...formData, [name]: value });
+
+    if (signupError) setSignupError('');
   };
-  
+
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { 
+    const newErrors = {
       name: '',
       email: '',
       phone: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
     };
-    
-    // Name validation
+
     if (!formData.name.trim()) {
       newErrors.name = 'Name is required';
       isValid = false;
     }
-    
-    // Email validation
+
     if (!formData.email) {
       newErrors.email = 'Email is required';
       isValid = false;
@@ -59,8 +51,7 @@ export default function Signup() {
       newErrors.email = 'Email is invalid';
       isValid = false;
     }
-    
-    // Phone validation
+
     if (!formData.phone) {
       newErrors.phone = 'Phone number is required';
       isValid = false;
@@ -68,8 +59,7 @@ export default function Signup() {
       newErrors.phone = 'Phone number is invalid';
       isValid = false;
     }
-    
-    // Password validation
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
@@ -80,8 +70,7 @@ export default function Signup() {
       newErrors.password = 'Password must contain uppercase, lowercase, and numbers';
       isValid = false;
     }
-    
-    // Confirm password validation
+
     if (!formData.confirmPassword) {
       newErrors.confirmPassword = 'Please confirm your password';
       isValid = false;
@@ -89,59 +78,44 @@ export default function Signup() {
       newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
-    
+
     setErrors(newErrors);
     return isValid;
   };
-  
-  const handleSubmit = async (e: { preventDefault: () => void; }) => {
+
+  const handleSubmit = async (e: { preventDefault: () => void }) => {
     e.preventDefault();
-    
-    if (!validateForm()) {
-      return;
-    }
-    
+    if (!validateForm()) return;
+
     setIsSubmitting(true);
     setSignupError('');
-    
+
     try {
-      // Build user object based on your User struct
-      const userData = {
-        role: 'caregiver',
-        name: formData.name,
-        email: formData.email,
-        phone: formData.phone,
-        password: formData.password,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
-      };
-      
-      // This is where you would make an API call to your backend
-      // Example:
-      // const response = await fetch('/api/signup', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(userData)
-      // });
-      
-      // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      console.log('Signup data:', userData);
-      
-      // For demo purposes, simulate success
-      // Store some user information in local storage
+      const response = await fetch('http://localhost:8090/web/caregiver/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          password: formData.password,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Signup failed');
+      }
+
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('userRole', 'caregiver');
       localStorage.setItem('userName', formData.name);
       localStorage.setItem('userEmail', formData.email);
-      
-      // Redirect to caregiver dashboard
+
       navigate('/caregiver-dashboard');
-      
-    } catch (error) {
-      console.error('Signup error:', error);
-      setSignupError('An error occurred during registration. Please try again.');
+    } catch (error: any) {
+      setSignupError(error.message || 'An error occurred during registration.');
     } finally {
       setIsSubmitting(false);
     }
@@ -228,18 +202,18 @@ export default function Signup() {
           box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.3);
           outline: none;
         }
-        
+
         .form-input.error {
           border-color: #ef4444;
           background-color: rgba(239, 68, 68, 0.05);
         }
-        
+
         .error-text {
           color: #ef4444;
           font-size: 0.8rem;
           margin-top: 0.25rem;
         }
-        
+
         .error-message {
           background-color: rgba(239, 68, 68, 0.1);
           border: 1px solid #ef4444;
@@ -273,7 +247,7 @@ export default function Signup() {
         .submit-button:active {
           transform: scale(0.98);
         }
-        
+
         .submit-button:disabled {
           background-color: #93c5fd;
           cursor: not-allowed;
@@ -325,31 +299,26 @@ export default function Signup() {
 
       <div className="signup-container">
         <div className="signup-box">
-        <img
+          <img
             src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWE2czdjcDk3emgybGFpazF0bHZqcnQ2bmJmbHZ2bDdkZmZvcW9rNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VbnUQpnihPSIgIXuZv/giphy.gif"
             alt="Login animation"
             className="gif-logo"
           />
           <h2 className="signup-title">Create Account</h2>
-          
-          {signupError && (
-            <div className="error-message">{signupError}</div>
-          )}
-          
+          {signupError && <div className="error-message">{signupError}</div>}
+
           <form onSubmit={handleSubmit}>
-            <div className="form-row">
-              <div className="form-group">
-                <label className="form-label">Full Name</label>
-                <input
-                  type="text"
-                  className={`form-input ${errors.name ? 'error' : ''}`}
-                  placeholder="John Doe"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-                {errors.name && <div className="error-text">{errors.name}</div>}
-              </div>
+            <div className="form-group">
+              <label className="form-label">Full Name</label>
+              <input
+                type="text"
+                className={`form-input ${errors.name ? 'error' : ''}`}
+                placeholder="John Doe"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+              />
+              {errors.name && <div className="error-text">{errors.name}</div>}
             </div>
 
             <div className="form-group">
@@ -389,8 +358,8 @@ export default function Signup() {
                   value={formData.password}
                   onChange={handleChange}
                 />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   className="password-toggle"
                   onClick={() => setShowPassword(!showPassword)}
                 >
@@ -413,8 +382,8 @@ export default function Signup() {
               {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
             </div>
 
-            <button 
-              type="submit" 
+            <button
+              type="submit"
               className="submit-button"
               disabled={isSubmitting}
             >

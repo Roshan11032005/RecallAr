@@ -9,8 +9,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	//"github.com/golang-jwt/jwt/v5"
 	"io/ioutil"
 	"net/http"
 	"os"
@@ -22,13 +22,11 @@ var (
 )
 
 func generateAndStoreRSAKeys() error {
-	// Generate RSA private key
 	privateKey, err := rsa.GenerateKey(rand.Reader, 2048)
 	if err != nil {
 		return err
 	}
 
-	// Save private key
 	privateKeyPEM := pem.EncodeToMemory(&pem.Block{
 		Type:  "RSA PRIVATE KEY",
 		Bytes: x509.MarshalPKCS1PrivateKey(privateKey),
@@ -37,7 +35,6 @@ func generateAndStoreRSAKeys() error {
 		return err
 	}
 
-	// Save public key
 	pubASN1, err := x509.MarshalPKIXPublicKey(&privateKey.PublicKey)
 	if err != nil {
 		return err
@@ -55,7 +52,6 @@ func generateAndStoreRSAKeys() error {
 }
 
 func loadRSAKeys() error {
-	// Load private key
 	privBytes, err := ioutil.ReadFile("privatekey.pem")
 	if err != nil {
 		return err
@@ -69,7 +65,6 @@ func loadRSAKeys() error {
 		return err
 	}
 
-	// Load public key
 	pubBytes, err := ioutil.ReadFile("publickey.pem")
 	if err != nil {
 		return err
@@ -87,23 +82,27 @@ func loadRSAKeys() error {
 }
 
 func main() {
-	// Generate RSA keys if not already present
 	if _, err := os.Stat("privatekey.pem"); os.IsNotExist(err) {
 		if err := generateAndStoreRSAKeys(); err != nil {
 			panic("Key generation failed: " + err.Error())
 		}
 	}
 
-	// Load the generated RSA keys
 	if err := loadRSAKeys(); err != nil {
 		panic("Key load failed: " + err.Error())
 	}
 
-	// Connect to MongoDB
 	database.ConnectMongo()
 
-	// Initialize Gin
 	router := gin.Default()
+
+	// ✅ Fixed CORS config
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:5173"}, // no trailing slash
+		AllowMethods:     []string{"GET", "POST", "OPTIONS"},
+		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
+		AllowCredentials: true,
+	}))
 
 	router.GET("/", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "Welcome to Gin!"})
@@ -120,7 +119,9 @@ func main() {
 
 	v2 := router.Group("/web")
 	{
-		v2.POST("/caregiver/signup",handlers.CaregiverSignup)
+		v2.POST("/caregiver/signup", handlers.CaregiverSignup)
+		v2.POST("/caregiver/login", handlers.WebLogin)
+		v2.POST("/caregiver/addface", handlers.AddKnownFace)
 	}
 
 	router.Run(":8090")
