@@ -1,19 +1,24 @@
-
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
-export default function Login() {
+export default function Signup() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
-    password: ''
+    phone: '',
+    password: '',
+    confirmPassword: '',
   });
   const [errors, setErrors] = useState({
+    name: '',
     email: '',
-    password: ''
+    phone: '',
+    password: '',
+    confirmPassword: '',
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [signupError, setSignupError] = useState('');
   
   const navigate = useNavigate();
   
@@ -23,16 +28,28 @@ export default function Login() {
       ...formData,
       [name]: value
     });
-      
-    // Clear general login error when any field changes
-    if (loginError) {
-      setLoginError('');
+  
+    // Clear general signup error when any field changes
+    if (signupError) {
+      setSignupError('');
     }
   };
   
   const validateForm = () => {
     let isValid = true;
-    const newErrors = { email: '', password: '' };
+    const newErrors = { 
+      name: '',
+      email: '',
+      phone: '',
+      password: '',
+      confirmPassword: ''
+    };
+    
+    // Name validation
+    if (!formData.name.trim()) {
+      newErrors.name = 'Name is required';
+      isValid = false;
+    }
     
     // Email validation
     if (!formData.email) {
@@ -43,12 +60,33 @@ export default function Login() {
       isValid = false;
     }
     
+    // Phone validation
+    if (!formData.phone) {
+      newErrors.phone = 'Phone number is required';
+      isValid = false;
+    } else if (!/^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im.test(formData.phone)) {
+      newErrors.phone = 'Phone number is invalid';
+      isValid = false;
+    }
+    
     // Password validation
     if (!formData.password) {
       newErrors.password = 'Password is required';
       isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
+    } else if (formData.password.length < 8) {
+      newErrors.password = 'Password must be at least 8 characters';
+      isValid = false;
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, and numbers';
+      isValid = false;
+    }
+    
+    // Confirm password validation
+    if (!formData.confirmPassword) {
+      newErrors.confirmPassword = 'Please confirm your password';
+      isValid = false;
+    } else if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
       isValid = false;
     }
     
@@ -64,43 +102,51 @@ export default function Login() {
     }
     
     setIsSubmitting(true);
-    setLoginError('');
+    setSignupError('');
     
     try {
+      // Build user object based on your User struct
+      const userData = {
+        role: 'caregiver',
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
       // This is where you would make an API call to your backend
       // Example:
-      // const response = await fetch('/api/login', {
+      // const response = await fetch('/api/signup', {
       //   method: 'POST',
       //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify(formData)
+      //   body: JSON.stringify(userData)
       // });
       
       // Simulate API call with timeout
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await new Promise(resolve => setTimeout(resolve, 1500));
       
-      // For demo purposes, let's assume login is successful if email contains "test"
-      if (formData.email.includes('test')) {
-        // Successful login
-        console.log('Login successful!', formData);
-        
-        // Store auth token, user info, etc.
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userEmail', formData.email);
-        
-        // Redirect to dashboard or home
-        navigate('/dashboard');
-      } else {
-        // Failed login
-        setLoginError('Invalid email or password');
-      }
+      console.log('Signup data:', userData);
+      
+      // For demo purposes, simulate success
+      // Store some user information in local storage
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('userRole', 'caregiver');
+      localStorage.setItem('userName', formData.name);
+      localStorage.setItem('userEmail', formData.email);
+      
+      // Redirect to caregiver dashboard
+      navigate('/caregiver-dashboard');
+      
     } catch (error) {
-      console.error('Login error:', error);
-      setLoginError('An error occurred. Please try again.');
+      console.error('Signup error:', error);
+      setSignupError('An error occurred during registration. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
-  
+
   return (
     <>
       <style>{`
@@ -113,22 +159,22 @@ export default function Login() {
           color: #f9fafb;
         }
 
-        .login-container {
+        .signup-container {
           display: flex;
           align-items: center;
           justify-content: center;
-          height: 100vh;
+          min-height: 100vh;
           width: 100vw;
-          padding: 1rem;
+          padding: 2rem 1rem;
         }
 
-        .login-box {
+        .signup-box {
           background-color: #1f2937;
           padding: 2.5rem;
           border-radius: 1.5rem;
           box-shadow: 0 20px 30px rgba(0, 0, 0, 0.5);
           width: 100%;
-          max-width: 22rem;
+          max-width: 28rem;
           animation: fadeIn 0.6s ease-out;
           text-align: center;
         }
@@ -146,7 +192,7 @@ export default function Login() {
           object-fit: cover;
         }
 
-        .login-title {
+        .signup-title {
           font-size: 1.75rem;
           font-weight: 700;
           color: #f9fafb;
@@ -216,6 +262,7 @@ export default function Login() {
           font-weight: 600;
           cursor: pointer;
           transition: background-color 0.3s ease, transform 0.2s ease;
+          margin-top: 0.5rem;
         }
 
         .submit-button:hover {
@@ -232,7 +279,7 @@ export default function Login() {
           cursor: not-allowed;
           transform: none;
         }
-        
+
         .password-container {
           position: relative;
         }
@@ -247,8 +294,8 @@ export default function Login() {
           color: #d1d5db;
           cursor: pointer;
         }
-        
-        .signup-link {
+
+        .login-link {
           margin-top: 1.5rem;
           display: block;
           color: #d1d5db;
@@ -257,30 +304,54 @@ export default function Login() {
           font-size: 0.9rem;
         }
 
-        .signup-link span {
+        .login-link span {
           color: #3b82f6;
           font-weight: 600;
         }
 
-        .signup-link:hover span {
+        .login-link:hover span {
           text-decoration: underline;
+        }
+
+        .form-row {
+          display: flex;
+          gap: 1rem;
+        }
+
+        .form-row .form-group {
+          flex: 1;
         }
       `}</style>
 
-<div className="login-container">
-        <div className="login-box">
-          <img
+      <div className="signup-container">
+        <div className="signup-box">
+        <img
             src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExZWE2czdjcDk3emgybGFpazF0bHZqcnQ2bmJmbHZ2bDdkZmZvcW9rNSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/VbnUQpnihPSIgIXuZv/giphy.gif"
             alt="Login animation"
             className="gif-logo"
           />
-          <h2 className="login-title">Welcome Back</h2>
+          <h2 className="signup-title">Create Account</h2>
           
-          {loginError && (
-            <div className="error-message">{loginError}</div>
+          {signupError && (
+            <div className="error-message">{signupError}</div>
           )}
           
           <form onSubmit={handleSubmit}>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Full Name</label>
+                <input
+                  type="text"
+                  className={`form-input ${errors.name ? 'error' : ''}`}
+                  placeholder="John Doe"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleChange}
+                />
+                {errors.name && <div className="error-text">{errors.name}</div>}
+              </div>
+            </div>
+
             <div className="form-group">
               <label className="form-label">Email</label>
               <input
@@ -293,6 +364,20 @@ export default function Login() {
               />
               {errors.email && <div className="error-text">{errors.email}</div>}
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Phone</label>
+              <input
+                type="tel"
+                className={`form-input ${errors.phone ? 'error' : ''}`}
+                placeholder="(123) 456-7890"
+                name="phone"
+                value={formData.phone}
+                onChange={handleChange}
+              />
+              {errors.phone && <div className="error-text">{errors.phone}</div>}
+            </div>
+
             <div className="form-group">
               <label className="form-label">Password</label>
               <div className="password-container">
@@ -314,17 +399,31 @@ export default function Login() {
               </div>
               {errors.password && <div className="error-text">{errors.password}</div>}
             </div>
+
+            <div className="form-group">
+              <label className="form-label">Confirm Password</label>
+              <input
+                type="password"
+                className={`form-input ${errors.confirmPassword ? 'error' : ''}`}
+                placeholder="••••••••"
+                name="confirmPassword"
+                value={formData.confirmPassword}
+                onChange={handleChange}
+              />
+              {errors.confirmPassword && <div className="error-text">{errors.confirmPassword}</div>}
+            </div>
+
             <button 
               type="submit" 
               className="submit-button"
               disabled={isSubmitting}
             >
-              {isSubmitting ? 'Signing In...' : 'Sign In'}
+              {isSubmitting ? 'Creating Account...' : 'Create Account'}
             </button>
           </form>
-          
-          <Link to="/signup" className="signup-link">
-            Don't have an account? <span>Create One</span>
+
+          <Link to="/login" className="login-link">
+            Already have an account? <span>Sign In</span>
           </Link>
         </div>
       </div>
