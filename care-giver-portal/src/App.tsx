@@ -8,6 +8,7 @@ import CaregiverDashboard from './pages/CaregiverDashboard';
 import DashboardHome from './pages/DashboardHome';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import MMSE from './pages/mmsetest';
 
 export default function App() {
   return (
@@ -15,7 +16,7 @@ export default function App() {
       {/* Public Routes */}
       <Route path="login" element={<Login />} />
       <Route path="signup" element={<Signup />} />
-      
+
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
         <Route path="dashboard" element={<CaregiverDashboard />}>
@@ -24,9 +25,14 @@ export default function App() {
           <Route path="reminders" element={<RemindersPage />} />
           <Route path="settings" element={<SettingsPage />} />
         </Route>
+
+        {/* MMSE Test as a separate protected page */}
+        <Route path="mmsetest" element={<MMSE />} />
+
+        {/* Redirect root to dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
-      
+
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>
