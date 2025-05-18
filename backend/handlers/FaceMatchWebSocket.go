@@ -85,7 +85,7 @@ func FaceMatchWebSocket(c *gin.Context) {
 			continue
 		}
 
-		const similarityThreshold = 26// tune this threshold (like your Python example)
+		const similarityThreshold = 35// tune this threshold (like your Python example)
 
 		matchedName := "Stranger"
 		for _, person := range people {

@@ -84,7 +84,7 @@ function haversineDistance(coords1: { latitude: number; longitude: number }, coo
 
 async function sendAlertToBackend(location: { latitude: number; longitude: number }) {
   try {
-    await fetch('https://90ef-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/mobile/alert', {
+    await fetch('https://2114-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/mobile/alert', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

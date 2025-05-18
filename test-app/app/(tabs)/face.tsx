@@ -11,7 +11,7 @@ export default function App() {
 
   // Initialize WebSocket connection
   useEffect(() => {
-    const websocket = new WebSocket('wss://90ef-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/ws/face-match'); // Replace with your server IP
+    const websocket = new WebSocket('wss://2114-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/ws/face-match'); // Replace with your server IP
     websocket.onopen = () => {
       console.log('WebSocket connected');
     };

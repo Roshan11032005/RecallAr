@@ -62,7 +62,7 @@ const RemindersScreen: React.FC = () => {
   // Fetch reminders from backend
   const fetchReminders = async () => {
     try {
-      const response = await axios.post('http://localhost:8091/web/caregiver/reminder-get');
+      const response = await axios.post('https://2114-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/web/caregiver/reminder-get');
       const fetchedReminders: Reminder[] = response.data;
       setReminders(fetchedReminders);
 

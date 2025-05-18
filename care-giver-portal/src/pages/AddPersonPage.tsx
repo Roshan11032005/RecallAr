@@ -34,7 +34,7 @@ export default function AddPersonPage() {
     }
 
     try {
-      const response = await fetch('https://90ef-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/web/add', {
+      const response = await fetch('https://2114-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/web/add', {
         method: 'POST',
         body: formData,
       });
