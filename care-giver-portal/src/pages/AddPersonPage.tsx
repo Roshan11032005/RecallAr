@@ -3,13 +3,15 @@ import { Upload, Camera } from 'lucide-react';
 
 export default function AddPersonPage() {
   const [image, setImage] = useState<string | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
   const [name, setName] = useState('');
   const [relationship, setRelationship] = useState('');
   const [notes, setNotes] = useState('');
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
+    if (file && file.type === 'image/png') {
+      setImageFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
         if (e.target && typeof e.target.result === 'string') {
@@ -17,18 +19,43 @@ export default function AddPersonPage() {
         }
       };
       reader.readAsDataURL(file);
+    } else {
+      alert('Please upload a PNG image.');
     }
   };
 
-  const handleSubmit = () => {
-    // Here you would handle the submission to your backend
-    console.log({ image, name, relationship, notes });
-    // Reset form
-    setImage(null);
-    setName('');
-    setRelationship('');
-    setNotes('');
-    alert('Person added successfully!');
+  const handleSubmit = async () => {
+    const formData = new FormData();
+    formData.append('name', name);
+    formData.append('relationship', relationship);
+    formData.append('notes', notes);
+    if (imageFile) {
+      formData.append('image', imageFile);
+    }
+
+    try {
+      const response = await fetch('https://90ef-2402-e280-212e-e5-5982-15cb-9f5c-f4b1.ngrok-free.app/web/add', {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to add person');
+      }
+
+      const data = await response.json();
+      alert(data.message || 'Person added successfully!');
+
+      setImage(null);
+      setImageFile(null);
+      setName('');
+      setRelationship('');
+      setNotes('');
+    } catch (error) {
+      console.error('Error adding person:', error);
+      alert(error instanceof Error ? error.message : 'An error occurred while adding the person');
+    }
   };
 
   return (
@@ -141,7 +168,6 @@ export default function AddPersonPage() {
           transform: scale(0.98);
         }
 
-        /* Image upload styles */
         .image-upload-container {
           display: flex;
           flex-direction: column;
@@ -230,78 +256,78 @@ export default function AddPersonPage() {
           }
         }
       `}</style>
-<center>
-      <div className="page-container">
-        <div className="content-card">
-          <h2 className="page-title">Add New Person</h2>
+      <center>
+        <div className="page-container">
+          <div className="content-card">
+            <h2 className="page-title">Add New Person</h2>
 
-          <div className="image-upload-container">
-            <div className={`image-preview ${image ? 'has-image' : ''}`}>
-              {image ? (
-                <>
-                  <img src={image} alt="Person" />
-                  <div className="shine-effect"></div>
-                </>
-              ) : (
-                <Camera className="camera-placeholder" size={48} />
-              )}
+            <div className="image-upload-container">
+              <div className={`image-preview ${image ? 'has-image' : ''}`}>
+                {image ? (
+                  <>
+                    <img src={image} alt="Person" />
+                    <div className="shine-effect"></div>
+                  </>
+                ) : (
+                  <Camera className="camera-placeholder" size={48} />
+                )}
+              </div>
+
+              <label className="upload-button">
+                <Upload size={16} className="upload-icon" />
+                Upload Photo
+                <input
+                  type="file"
+                  accept="image/png"
+                  onChange={handleImageUpload}
+                  style={{ display: 'none' }}
+                />
+              </label>
             </div>
 
-            <label className="upload-button">
-              <Upload size={16} className="upload-icon" />
-              Upload Photo
+            <div className="form-group">
+              <label className="form-label">Name</label>
               <input
-                type="file"
-                accept="image/*"
-                onChange={handleImageUpload}
-                style={{ display: 'none' }}
+                type="text"
+                value={name}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
+                className="form-input"
+                placeholder="Enter person's name"
               />
-            </label>
-          </div>
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Name</label>
-            <input
-              type="text"
-              value={name}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-              className="form-input"
-              placeholder="Enter person's name"
-            />
-          </div>
+            <div className="form-group">
+              <label className="form-label">Relationship</label>
+              <select
+                value={relationship}
+                onChange={(e: ChangeEvent<HTMLSelectElement>) => setRelationship(e.target.value)}
+                className="form-select"
+              >
+                <option value="">Select Relationship</option>
+                <option value="Family Member">Family Member</option>
+                <option value="Friend">Friend</option>
+                <option value="Caregiver">Caregiver</option>
+                <option value="Doctor">Doctor</option>
+                <option value="Neighbor">Neighbor</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Relationship</label>
-            <select
-              value={relationship}
-              onChange={(e: ChangeEvent<HTMLSelectElement>) => setRelationship(e.target.value)}
-              className="form-select"
-            >
-              <option value="">Select Relationship</option>
-              <option value="Family Member">Family Member</option>
-              <option value="Friend">Friend</option>
-              <option value="Caregiver">Caregiver</option>
-              <option value="Doctor">Doctor</option>
-              <option value="Neighbor">Neighbor</option>
-              <option value="Other">Other</option>
-            </select>
-          </div>
+            <div className="form-group">
+              <label className="form-label">Notes (Optional)</label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="form-textarea"
+                placeholder="Add helpful details about this person..."
+              />
+            </div>
 
-          <div className="form-group">
-            <label className="form-label">Notes (Optional)</label>
-            <textarea
-              value={notes}
-              onChange={(e) => setNotes(e.target.value)}
-              className="form-textarea"
-              placeholder="Add helpful details about this person..."
-            />
+            <button onClick={handleSubmit} className="submit-button">
+              Save Person
+            </button>
           </div>
-
-          <button onClick={handleSubmit} className="submit-button">
-            Save Person
-          </button>
         </div>
-      </div>
       </center>
     </>
   );

@@ -1,0 +1,5 @@
+{
+    "java.inlayHints.parameterNames.exclusions": [
+        "websocket"
+    ]
+}

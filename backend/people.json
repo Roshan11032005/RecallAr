@@ -1,0 +1,26 @@
+[
+  {
+    "id": "21ea2de2-0e7b-4d76-9f0b-56adb0da4fbe",
+    "name": "roshan",
+    "relationship": "Friend",
+    "notes": "chill guy",
+    "image_path": "images\\9cbf6cf2-396d-4e51-8084-140fbde66436.jpeg",
+    "created_at": "2025-05-18T10:31:47.1816784+05:30"
+  },
+  {
+    "id": "7d7c8446-c158-4959-98fd-beebb6ed767b",
+    "name": "rosn",
+    "relationship": "Other",
+    "notes": "yoo this nigaa is cool",
+    "image_path": "images\\1bf97d5a-bcfe-4054-8a58-92d0c80433b6.png",
+    "created_at": "2025-05-18T13:39:03.7185305+05:30"
+  },
+  {
+    "id": "6b8ba02a-cd05-4489-bdd9-352f7396a205",
+    "name": "chamesh",
+    "relationship": "Other",
+    "notes": "local gunda",
+    "image_path": "images\\8e7aac8a-9911-4cf8-ba84-1922d0cd9399.png",
+    "created_at": "2025-05-18T13:49:35.4878252+05:30"
+  }
+]

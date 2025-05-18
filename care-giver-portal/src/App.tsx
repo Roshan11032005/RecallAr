@@ -8,6 +8,7 @@ import CaregiverDashboard from './pages/CaregiverDashboard';
 import DashboardHome from './pages/DashboardHome';
 import SettingsPage from './pages/SettingsPage';
 import ProtectedRoute from './components/ProtectedRoute';
+import AlzheimersPrediction from './pages/alzimerspage';
 
 export default function App() {
   return (
@@ -26,7 +27,8 @@ export default function App() {
         </Route>
         <Route path="/" element={<Navigate to="/dashboard" replace />} />
       </Route>
-      
+    
+    <Route path = "/prediction" element={<AlzheimersPrediction></AlzheimersPrediction>}></Route>
       {/* Catch all */}
       <Route path="*" element={<Navigate to="/login" replace />} />
     </Routes>

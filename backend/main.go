@@ -111,18 +111,23 @@ func main() {
 	router.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
-
+   router.GET("/ws/face-match", handlers.FaceMatchWebSocket)
 	v1 := router.Group("/mobile")
 	{
 		v1.POST("/login", handlers.MobileLogin)
+		v1.POST("/alert",handlers.AlertHandler)
 	}
 
 	v2 := router.Group("/web")
 	{
 		v2.POST("/caregiver/signup", handlers.CaregiverSignup)
 		v2.POST("/caregiver/login", handlers.WebLogin)
-		v2.POST("/caregiver/addface", handlers.AddKnownFace)
+		v2.POST("/caregiver/addface", handlers.AddPersonHandler)
+		v2.POST("/cargiver/remainder",handlers.AddReminder)
+		v2.POST("/caregiver/reminder-get",handlers.GetReminders)
+		v2.POST("/add",handlers.AddPersonHandler)
+		v2.GET("/getpeople",handlers.GetPeopleHandler)
 	}
 
-	router.Run(":8090")
+	router.Run(":8091")
 }
